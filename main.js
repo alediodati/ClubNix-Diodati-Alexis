@@ -1,7 +1,7 @@
 // VARIABLES
 let user
 let cart = []
-let products = [];
+let products = []
 
 // FUNCTIONS
 function init() {
@@ -15,32 +15,32 @@ function mostrarProductos() {
   let html = ''
 
   fetch('http://127.0.0.1:5501/products.json')
-  .then((response) => {
-    return response.json()
-  })
-  .then((data) => {
-    products = data
-console.log(products)
-    products.forEach((product) => {
-      html += `
+    .then((response) => {
+      return response.json()
+    })
+    .then((data) => {
+      products = data
+      console.log(products)
+      products.forEach((product) => {
+        html += `
         <div class="product">
           <h3>${product.name}</h3>
-          <img src="./img/${product.img}" alt="${product.name}">
+          <img src="./img/${product.img}" alt="${product.name}" class="product-img">
           <p>Precio: $${product.price}</p>
           <input type="number" id="qty-${product.id}" value="0">
           <button onclick="agregarAlCarrito(${product.id})">Agregar al carrito</button>
         </div>
       `
+      })
+      document.getElementById('productos').innerHTML = html
     })
-    document.getElementById('productos').innerHTML = html
-  })
-  .catch((error) => {
-    console.error('Error al obtener el JSON:', error);
-  });
+    .catch((error) => {
+      console.error('Error al obtener el JSON:', error)
+    })
 }
 
 function agregarAlCarrito(id) {
-  let qty = parseInt(document.getElementById(`qty-${id}`).value);
+  let qty = parseInt(document.getElementById(`qty-${id}`).value)
   if (qty > 0) {
     let product = products.find((product) => product.id === id)
     if (cart.includes(product)) {
@@ -112,10 +112,10 @@ document.getElementById('login-btn').addEventListener('click', () => {
     document.getElementById('pagina_principal').style.display = 'flex'
   } else {
     Swal.fire({
-      title: "Error",
-      text: "Por favor complete todos los campos y verifique ser mayor de edad",
-      icon: "error"
-    });
+      title: 'Error',
+      text: 'Por favor complete todos los campos y verifique ser mayor de edad',
+      icon: 'error'
+    })
   }
 })
 
@@ -135,14 +135,13 @@ document.getElementById('carrito-close').addEventListener('click', () => {
 
 document.getElementById('carrito-finish').addEventListener('click', () => {
   Swal.fire({
-    title: "Compra Finalizada",
-    text: "Gracias por su compra, beba con moderacion",
-    icon: "success",
-    confirmButtonText: "Confirmar"
+    title: 'Gracias por su compra',
+    text: 'Pase por caja y retire su compra con sus datos de usuario',
+    icon: 'success',
+    confirmButtonText: 'Confirmar'
   }).then((result) => {
     location.reload()
-  });
-  
+  })
 })
 
 init()
