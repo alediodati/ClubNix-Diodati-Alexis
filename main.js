@@ -1,34 +1,7 @@
 // VARIABLES
 let user
 let cart = []
-
-let fernet = {
-  id: 1,
-  name: 'Fernet',
-  price: 500,
-  img: 'fernet.jpeg',
-  qty: 0
-  
-  
-}
-
-let cerveza = {
-  id: 2,
-  name: 'Cerveza',
-  price: 400,
-  img: 'cerveza.jpeg',
-  qty: 0
-}
-
-let cocaCola = {
-  id: 3,
-  name: 'Coca Cola',
-  price: 400,
-  img: 'cocacola.jpeg',
-  qty: 0
-}
-
-let products = [cerveza, fernet, cocaCola]
+let products = [];
 
 // FUNCTIONS
 function init() {
@@ -40,22 +13,34 @@ function init() {
 }
 function mostrarProductos() {
   let html = ''
-  products.forEach((product) => {
-    html += `
-      <div class="product">
-        <h3>${product.name}</h3>
-        <img src="img/${product.img}" alt="${product.name}">
-        <p>Precio: $${product.price}</p>
-        <input type="number" id="qty-${product.id}" value="0">
-        <button onclick="agregarAlCarrito(${product.id})">Agregar al carrito</button>
-      </div>
-    `
+
+  fetch('http://127.0.0.1:5501/products.json')
+  .then((response) => {
+    return response.json()
   })
-  document.getElementById('productos').innerHTML = html
+  .then((data) => {
+    products = data
+console.log(products)
+    products.forEach((product) => {
+      html += `
+        <div class="product">
+          <h3>${product.name}</h3>
+          <img src="./img/${product.img}" alt="${product.name}">
+          <p>Precio: $${product.price}</p>
+          <input type="number" id="qty-${product.id}" value="0">
+          <button onclick="agregarAlCarrito(${product.id})">Agregar al carrito</button>
+        </div>
+      `
+    })
+    document.getElementById('productos').innerHTML = html
+  })
+  .catch((error) => {
+    console.error('Error al obtener el JSON:', error);
+  });
 }
 
 function agregarAlCarrito(id) {
-  let qty = parseInt(document.getElementById(`qty-${id}`).value)
+  let qty = parseInt(document.getElementById(`qty-${id}`).value);
   if (qty > 0) {
     let product = products.find((product) => product.id === id)
     if (cart.includes(product)) {
@@ -73,6 +58,8 @@ function agregarAlCarrito(id) {
   }
 
   document.getElementById(`qty-${id}`).value = 0
+
+  mostrarCarrito()
 }
 
 function mostrarCarrito() {
@@ -88,8 +75,7 @@ function mostrarCarrito() {
     `
   })
   document.getElementById('carrito_contenedor').style.display = 'block'
-  document.getElementById('carrito').innerHTML = html
-  document.getElementById('carrito-close').style.display = 'block'
+  document.getElementById('carrito-card').innerHTML = html
 }
 
 function EliminarDelCarrito(id) {
@@ -125,9 +111,11 @@ document.getElementById('login-btn').addEventListener('click', () => {
     document.getElementById('validacion').style.display = 'none'
     document.getElementById('pagina_principal').style.display = 'flex'
   } else {
-    alert(
-      'Por favor, complete todos los campos y verifique que sea mayor de edad'
-    )
+    Swal.fire({
+      title: "Error",
+      text: "Por favor complete todos los campos y verifique ser mayor de edad",
+      icon: "error"
+    });
   }
 })
 
@@ -137,13 +125,24 @@ document.getElementById('logout-btn').addEventListener('click', () => {
 })
 
 document.getElementById('carrito-btn').addEventListener('click', () => {
-  document.getElementById('carrito').style.display = 'block'
+  document.getElementById('carrito-card').style.display = 'block'
   mostrarCarrito()
 })
 
 document.getElementById('carrito-close').addEventListener('click', () => {
   document.getElementById('carrito_contenedor').style.display = 'none'
-  document.getElementById('carrito-close').style.display = 'none'
+})
+
+document.getElementById('carrito-finish').addEventListener('click', () => {
+  Swal.fire({
+    title: "Compra Finalizada",
+    text: "Gracias por su compra, beba con moderacion",
+    icon: "success",
+    confirmButtonText: "Confirmar"
+  }).then((result) => {
+    location.reload()
+  });
+  
 })
 
 init()
